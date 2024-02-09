@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, Boolean, Text, String, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, Boolean, Text, String, ForeignKey, DateTime, Table
 from sqlalchemy_utils.types import ChoiceType
 from sqlalchemy.orm import relationship
 from enums import BAND_GENRES
@@ -27,24 +27,37 @@ class Band(Base):
     def __repr__(self):
         return f"<Band {self.id}"
 
+class Address(Base):
+    __tablename__ = "address"
+    id = Column(Integer, primary_key=True)
+    building=Column(String(100)) #      Apt, office, suite, etc. (Optional)
+    street=Column(String(100)) #        Street address     
+    city=Column(String(100)) #          City
+    state=Column(String(100)) #         State, province or prefecture
+    zip_code=Column(String(100)) #      Zip code 
+    country=Column(String(100)) #       Country
+
 class Concert(Base):
     __tablename__='concert'
     id=Column(Integer,primary_key=True)
     setlist_url=Column(Text,nullable=True)
     showdate=Column(DateTime)
-    band_id = Column(Integer,ForeignKey(Band.id))
-    user_id = Column(Integer,ForeignKey(User.id))
+    venue=Column(String(100))
+    address_id = Column(Integer,ForeignKey(Address.id),nullable=True)
+    # band_id = Column(Integer,ForeignKey(Band.id))
+    # user_id = Column(Integer,ForeignKey(User.id))
 
     def __repr__(self):
         return f"<Concert {self.id}"
 
-# class Banana(Base):
-#     __tablename__='banana'
-#     id=Column(Integer,primary_key=True)
-#     name=Column(String(100),unique=True) 
-#     ## concert fields here...
-#     # band_id = Column(Integer,ForeignKey(Band.id))
-#     # user_id = Column(Integer,ForeignKey(User.id))
+class UserConcert(Base):
+    __tablename__ = "user_concert_xref"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('app_user.id'))
+    concert_id = Column(Integer, ForeignKey('concert.id'))
 
-#     def __repr__(self):
-#         return f"<Banana {self.id}"
+class BandConcert(Base):
+    __tablename__ = "band_concert_xref"
+    id = Column(Integer, primary_key=True)
+    band_id = Column(Integer, ForeignKey('band.id'))
+    concert_id = Column(Integer, ForeignKey('concert.id'))
