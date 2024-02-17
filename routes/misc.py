@@ -1,13 +1,13 @@
 from fastapi import APIRouter
 
-misc_router = APIRouter(
+router = APIRouter(
     tags=["Misc"]
 )
 
-@misc_router.get('/')
+@router.get('/')
 async def index():
     return {"message":"Home"}
 
-@misc_router.get('/about')
+@router.get('/about')
 async def about():
     return {"message":"About"}

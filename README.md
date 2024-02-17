@@ -13,7 +13,7 @@ This backend application will serve as the
     - `python3 -m venv venv`
     - `source venv/bin/activate`
 1. Install python modules
-    - `pip install fastapi sqlalchemy databases jose passlib uvicorn psycopg2 sqlalchemy_utils`
+    - `pip install fastapi sqlalchemy databases python-jose passlib uvicorn psycopg2 sqlalchemy_utils python-multipart`
 1. Create postgres database
     - create database named `concerts`
     - `python3 init_database.py`

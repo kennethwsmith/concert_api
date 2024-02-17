@@ -1,18 +1,18 @@
 from fastapi import APIRouter
-from database import Session, Base
-from models import User, Band, Concert, BandConcert, UserConcert
+from database import Session
+from models import User, Band, Concert, BandConcert, UserConcert, Venue, Address
 from sqlalchemy import Integer, func
 from sqlalchemy.dialects.postgresql import ARRAY
 from fastapi.responses import HTMLResponse
 
 session = Session()
 
-admin_router = APIRouter(
+router = APIRouter(
     prefix='/admin',
     tags=["Admin"]
 )
 
-@admin_router.get('/', response_class=HTMLResponse)
+@router.get('/', response_class=HTMLResponse)
 async def index():
     return """
     <html>
@@ -25,22 +25,21 @@ async def index():
     </html>
     """
 
-@admin_router.get('/full_load')
-async def index():
-    concerts_agg = func.array_agg(func.json_build_object("showdate",Concert.showdate,"venue",Concert.venue,"State","TX")).label('concerts')
-    q = session.query(Band.name, concerts_agg)\
+@router.get('/full_load')
+async def index(skip: int = 0, limit: int = 10):
+    concerts_agg = func.array_agg(
+        func.json_build_object(
+                "showdate",Concert.showdate,"venue",Venue.name,"street",Venue.street,"city",Venue.city,"state",Venue.state,"zip_code",Venue.zip_code,"country",Venue.country
+            )
+        ).label('concerts'
+    )
+    q = session.query(Band.name, Band.genre, concerts_agg)\
             .filter(BandConcert.concert_id == Concert.id)\
+            .filter(Concert.venue_id == Venue.id)\
             .filter(BandConcert.band_id == Band.id)\
-            .group_by(Band.name)\
+            .group_by(Band.name, Band.genre)\
+            .limit(limit)\
+            .offset(skip)\
         .all()
     return q
 
-# @admin_router.get('/full_load')
-# async def index():
-#     concerts_agg = func.array_agg(func.json_build_object("showdate",Concert.showdate,"venue",Concert.venue,"State","TX")).label('concerts')
-#     q = session.query(Band.name, concerts_agg)\
-#             .filter(BandConcert.concert_id == Concert.id)\
-#             .filter(BandConcert.band_id == Band.id)\
-#             .group_by(Band.name)\
-#         .all()
-#     return q
