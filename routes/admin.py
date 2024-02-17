@@ -4,6 +4,7 @@ from models import User, Band, Concert, BandConcert, UserConcert, Venue, Address
 from sqlalchemy import Integer, func
 from sqlalchemy.dialects.postgresql import ARRAY
 from fastapi.responses import HTMLResponse
+from init_database import ReloadDatabase
 
 session = Session()
 
@@ -43,3 +44,7 @@ async def index(skip: int = 0, limit: int = 10):
         .all()
     return q
 
+@router.get('/reload_database')
+async def ReloadDB(DropAllTables:bool = True, CreateTables:bool = True, TruncateTables:bool = False, CreateData:bool = True):
+    ReloadDatabase(DropAllTables = DropAllTables, CreateTables = CreateTables, TruncateTables = TruncateTables, CreateData = CreateData)
+    return {"message":"Reloaded Database"}
