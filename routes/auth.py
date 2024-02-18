@@ -95,11 +95,11 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 router = APIRouter(
     prefix='/auth',
-    tags=["Authentication"]
+    tags=["Auth"]
 )
 
 @router.post("/token")
-async def login_for_access_token(
+async def log_in_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ) -> Token:
     user = authenticate_user(fake_users_db, form_data.username, form_data.password)
@@ -116,29 +116,23 @@ async def login_for_access_token(
     return Token(access_token=access_token, token_type="bearer")
 
 @router.get("/me")
-async def read_users_me(
-    current_user: Annotated[AuthUser, Depends(get_current_active_user)]):
+async def get_current_user(current_user: Annotated[AuthUser, Depends(get_current_active_user)]):
     return current_user
 
 @router.get('/')
 async def index():
-    return {"message":"auth"}
-
-#FIXME: needs to be secured
-@router.post('/createUser')
-async def index():
-    return {"message":"Create User"}
+    return {"message":"auth Index"}
 
 @router.post('/session')
-async def login():
-    return {"message":"login"}
+async def get_current_session():
+    return {"message":"session"}
 
 @router.delete('/session')
-async def logout():
+async def log_out_current_session():
     return {"message":"logout"}
 
 @router.get('/session')
-async def state():
+async def get_current_state():
     return {"message":"session state: unknown"}
 
 

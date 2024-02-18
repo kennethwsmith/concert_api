@@ -11,7 +11,7 @@ router = APIRouter(
 session = Session()
 
 @router.get('/')
-async def index(skip:int = 0, limit:int = 10):
+async def get_all_bands(skip:int = 0, limit:int = 10):
     q = session.query(Band)\
         .limit(limit)\
         .offset(skip)\
@@ -19,7 +19,7 @@ async def index(skip:int = 0, limit:int = 10):
     return q
 
 @router.post('/')
-async def createBand(name:str, genre:BandGenre_enum = "Rock"):
+async def create_band(name:str, genre:BandGenre_enum = "Rock"):
     try:
         new_band = Band(name=name,genre=genre)
         session.add(new_band)
@@ -34,12 +34,12 @@ async def createBand(name:str, genre:BandGenre_enum = "Rock"):
     return {"message":"Created Band, ID: " + str(new_band_id)}
 
 @router.get('/{band_id}')
-async def getBand(band_id: int):
+async def get_band(band_id: int):
     q = session.query(Band).filter(Band.id==band_id).one()
     return q
 
 @router.patch('/{band_id}')
-async def updateBand(band_id: int, name:str = None, genre:BandGenre_enum = None):
+async def update_band(band_id: int, name:str = None, genre:BandGenre_enum = None):
     b = session.query(Band).filter_by(id=band_id).one()
     if(name != None):
         b.name = name
@@ -49,7 +49,7 @@ async def updateBand(band_id: int, name:str = None, genre:BandGenre_enum = None)
     return {"message":"Updated Band, ID: " + str(b.id)}
 
 @router.delete('/{band_id}')
-async def deleteBand(band_id:int):
+async def delete_band(band_id:int):
     session.query(Band).filter(Band.id==band_id).delete()
     session.commit()
     return {"message":"Deleted Band ID: " + str(band_id)}
